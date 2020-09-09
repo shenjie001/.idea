@@ -349,7 +349,8 @@ a.popup_link:hover {
     font-family: "Lucida Console", "Courier New", Courier, monospace;
     text-align: left;
     font-size: 8pt;
-    width: 500px;
+    width: 800px;
+
 }
 
 }
@@ -367,6 +368,7 @@ a.popup_link:hover {
     font-weight: bold;
     color: white;
     background-color: #777;
+    text-align:center;
 }
 #result_table td {
     border: 1px solid #777;
@@ -407,8 +409,6 @@ a.popup_link:hover {
     HEADING_ATTRIBUTE_TMPL = """<p class='attribute'><strong>%(name)s:</strong> %(value)s</p>
 """ # variables: (name, value)
 
-
-
     # ------------------------------------------------------------------------
     # Report
     #
@@ -429,7 +429,7 @@ a.popup_link:hover {
 <col align='right' />
 </colgroup>
 <tr id='header_row'>
-    <td>Test Group/Test case</td>
+    <td colspan='2'>Test Group/Test case</td>
     <td>Count</td>
     <td>Pass</td>
     <td>Fail</td>
@@ -438,7 +438,7 @@ a.popup_link:hover {
 </tr>
 %(test_list)s
 <tr id='total_row'>
-    <td>Total</td>
+    <td colspan='2'>Total</td>
     <td>%(count)s</td>
     <td>%(Pass)s</td>
     <td>%(fail)s</td>
@@ -451,6 +451,7 @@ a.popup_link:hover {
     REPORT_CLASS_TMPL = r"""
 <tr class='%(style)s'>
     <td>%(desc)s</td>
+    <td>%(description)s</td>
     <td>%(count)s</td>
     <td>%(Pass)s</td>
     <td>%(fail)s</td>
@@ -462,8 +463,8 @@ a.popup_link:hover {
 
     REPORT_TEST_WITH_OUTPUT_TMPL = r"""
 <tr id='%(tid)s' class='%(Class)s'>
-    <td class='%(style)s'><div class='testcase'>%(desc)s</div></td>
-    <td colspan='5' align='center'>
+    <td colspan='2' class='%(style)s'><div class='testcase'>%(desc)s</div></td>
+    <td colspan='7' align='center'>
 
     <!--css div popup start-->
     <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_%(tid)s')" >
@@ -495,14 +496,12 @@ a.popup_link:hover {
 
     REPORT_TEST_OUTPUT_TMPL = r"""
 %(id)s: %(output)s
-""" # variables: (id, output)
-
-
+"""
+    # variables: (id, output)
 
     # ------------------------------------------------------------------------
     # ENDING
     #
-
     ENDING_TMPL = """<div id='ending'>&nbsp;</div>"""
 
 # -------------------- The end of the Template class -------------------
@@ -628,8 +627,7 @@ class HTMLTestRunner(Template_mixin):
         test(result)
         self.stopTime = datetime.datetime.now()
         self.generateReport(test, result)
-        # print >> sys.stderr, '\nTime Elapsed: %s' % (self.stopTime-self.startTime)
-        print(sys.stderr, '\nTime Elapsed: %s' % (self.stopTime-self.startTime))
+        print('\nTime Elapsed: %s' % (self.stopTime-self.startTime), file=sys.stderr)
         return result
 
 
@@ -660,7 +658,7 @@ class HTMLTestRunner(Template_mixin):
         if result.failure_count: status.append('Failure %s' % result.failure_count)
         if result.error_count:   status.append('Error %s'   % result.error_count  )
         if status:
-            status = ' '.join(status)
+            status = ' | '.join(status)
         else:
             status = 'none'
         return [
@@ -685,7 +683,7 @@ class HTMLTestRunner(Template_mixin):
             report = report,
             ending = ending,
         )
-        self.stream.write(output.encode('utf-8'))
+        self.stream.write(output.encode('utf8'))
 
 
     def _generate_stylesheet(self):
@@ -726,10 +724,12 @@ class HTMLTestRunner(Template_mixin):
                 name = "%s.%s" % (cls.__module__, cls.__name__)
             doc = cls.__doc__ and cls.__doc__.split("\n")[0] or ""
             desc = doc and '%s: %s' % (name, doc) or name
+            description = cls_results[0][1].case_name
 
             row = self.REPORT_CLASS_TMPL % dict(
                 style = ne > 0 and 'errorClass' or nf > 0 and 'failClass' or 'passClass',
                 desc = desc,
+                description = description,
                 count = np+nf+ne,
                 Pass = np,
                 fail = nf,
@@ -764,21 +764,19 @@ class HTMLTestRunner(Template_mixin):
         if isinstance(o,str):
             # TODO: some problem with 'string_escape': it escape \n and mess up formating
             # uo = unicode(o.encode('string_escape'))
-            # uo = o.decode('latin-1')
-            uo = e
+            uo = o
         else:
             uo = o
         if isinstance(e,str):
             # TODO: some problem with 'string_escape': it escape \n and mess up formating
             # ue = unicode(e.encode('string_escape'))
-            # ue = e.decode('latin-1')
             ue = e
         else:
             ue = e
 
         script = self.REPORT_TEST_OUTPUT_TMPL % dict(
             id = tid,
-            output = saxutils.escape(str(uo)+ue),
+            output = saxutils.escape(uo+ue),
         )
 
         row = tmpl % dict(

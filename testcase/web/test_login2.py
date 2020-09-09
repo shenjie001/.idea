@@ -7,7 +7,7 @@ from selenium.webdriver.common.keys import Keys
 class demotest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.drver = webdriver.Chrome(r"E:\git project\UIAutomationTest\test\res\driver\chrome\chromedriver.exe")
+        cls.drver = webdriver.Chrome(r"E:\PYproject\.idea\chromedriver.exe")
         cls.drver.maximize_window()
         cls.drver.implicitly_wait(10)
         cls.url = "http://jackey.mileclass.cn:9949/user/login"
@@ -23,11 +23,11 @@ class demotest(unittest.TestCase):
         # drver.get('http://jackey.mileclass.cn:9949/user/login')
         # drver.find_element_by_xpath('/html/body/div/div[2]/div/div/div[2]/div[1]/input').clear(username)
         # time.sleep(3)
-        drver.find_element_by_xpath('/html/body/div/div[2]/div/div/div[2]/div[1]/input').send_keys(username)
+        drver.find_element_by_xpath('/html/body/div[1]/div[1]/div/div/div[2]/div[1]/div/input').send_keys(username)
         # drver.find_element_by_xpath('//*[@class=\'pwd_item\']').clear(password)
         # time.sleep(3)
-        drver.find_element_by_xpath('//*[@class=\'pwd_item\']').send_keys(password)
-        drver.find_element_by_xpath('/html/body/div/div[2]/div/div/button').click()
+        drver.find_element_by_xpath('/html/body/div[1]/div[1]/div/div/div[2]/div[2]/div/input').send_keys(password)
+        drver.find_element_by_xpath('/html/body/div[1]/div[1]/div/div/button/span').click()
 
 
     def test_login_fail(self):
@@ -37,7 +37,7 @@ class demotest(unittest.TestCase):
         # drver.find_element_by_xpath('//*[@class=\'pwd_item\']').send_keys('123456')
         # drver.find_element_by_xpath('/html/body/div/div[2]/div/div/button').click()
         # time.sleep(3)
-        tip = drver.find_element_by_xpath("/html/body/div/div[2]/div/div/div[3]/div/span/span").text
+        tip = drver.find_element_by_xpath("/html/body/div[1]/div[1]/div/div/div[3]/div").text
         self.assertEquals(tip, '账户名与密码不匹配，请重新输入')
 
     def test_login_success(self):
@@ -45,8 +45,8 @@ class demotest(unittest.TestCase):
         time.sleep(3)
         # drver.find_element_by_xpath('/html/body/div/div[2]/div/div/div[2]/div[1]/input').clear()
         # drver.find_element_by_xpath('//*[@class=\'pwd_item\']').clear()
-        ele1 = drver.find_element_by_xpath('/html/body/div/div[2]/div/div/div[2]/div[1]/input')
-        ele2 = drver.find_element_by_xpath('//*[@class=\'pwd_item\']')
+        ele1 = drver.find_element_by_xpath('/html/body/div[1]/div[1]/div/div/div[2]/div[1]/div/input')
+        ele2 = drver.find_element_by_xpath('/html/body/div[1]/div[1]/div/div/div[2]/div[2]/div/input')
         ele1.send_keys(Keys.CONTROL+'a')
         ele1.send_keys(Keys.DELETE)
         ele2.send_keys(Keys.CONTROL+'a')
@@ -58,9 +58,7 @@ class demotest(unittest.TestCase):
         self.assertIn(tip, '梁晓蝶')
         drver.find_element_by_xpath('/html/body/div/div[2]/div/div[1]/ul/li[2]/a/span').click()
         time.sleep(3)
-        drver.find_element_by_xpath(
-            '/html/body/div/div[2]/div/div[2]/div/div[2]/div[2]/div[1]/ul/li[1]/a/div/div[2]/p[1]').click()
-        time.sleep(5)
+
 
 
 if __name__ == '__main__':
